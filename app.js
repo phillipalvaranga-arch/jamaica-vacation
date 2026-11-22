@@ -167,6 +167,34 @@
     return { airbnb, vrbo, booking };
   }
 
+  function carLinks(t) {
+    const apt = t.to === "KIN" ? "KIN" : "MBJ";
+    const label = apt === "KIN"
+      ? "Kingston Norman Manley International Airport (KIN)"
+      : "Montego Bay Sangster International Airport (MBJ)";
+    const dep = t.depart;
+    const ret = t.ret || t.depart;
+    const mdy = (iso) => {
+      if (!iso) return "";
+      const [y, m, d] = iso.split("-");
+      return m + "/" + d + "/" + y;
+    };
+    const kayak = dep && ret
+      ? "https://www.kayak.com/cars/" + apt + "/" + dep + "/" + ret
+      : "https://www.kayak.com/cars/" + apt;
+    const expedia = dep && ret
+      ? "https://www.expedia.com/carsearch?locn=" + encodeURIComponent(label) + "&date1=" + mdy(dep) + "&date2=" + mdy(ret) + "&time1=1030AM&time2=1030AM"
+      : "https://www.expedia.com/carsearch?locn=" + encodeURIComponent(label);
+    const google = "https://www.google.com/travel/cars?q=" + encodeURIComponent("Car rental " + label + (dep && ret ? " " + dep + " to " + ret : ""));
+    const priceline = dep && ret
+      ? "https://www.priceline.com/rentalcars/#/results/" + apt + "/" + apt + "/" + dep + "/" + ret + "/10:30/10:30"
+      : "https://www.priceline.com/rentalcars/";
+    const discover = dep && ret
+      ? "https://www.discovercars.com/jamaica?pickupDate=" + dep + "&dropoffDate=" + ret + "&pickupLocation=" + apt
+      : "https://www.discovercars.com/jamaica";
+    return { apt, label, kayak, expedia, google, priceline, discover };
+  }
+
   /* ---------- trip details for the bot ---------- */
   function tripMessage() {
     const t = trip();
@@ -183,6 +211,7 @@
       "Dates: " + dateLabel(t) + (t.flexible ? " (flexible dates preferred)" : ""),
       "Travelers: " + t.adults + " adult" + (Number(t.adults) === 1 ? "" : "s") + (Number(t.children) ? ", " + t.children + " child(ren)" : ""),
       area ? "Area: " + area : "Area: not chosen yet",
+      "Car rental: I'd like to compare a rental car at " + (t.to === "KIN" ? "KIN (Norman Manley)" : "MBJ (Sangster)") + (t.depart ? ", pickup " + t.depart + " and return " + (t.ret || t.depart) : " (dates not set yet)") + ".",
       "",
       "Saved picks:",
       picks,
@@ -318,6 +347,52 @@
     return `<button type="button" class="btn ${on ? "btn-gold" : "btn-ghost"} btn-sm" data-act="toggle-save" data-item='${esc(JSON.stringify(item))}'>${on ? "★ Saved" : "☆ Save to shortlist"}</button>`;
   }
 
+  function carCompareBtns(t) {
+    const L = carLinks(t);
+    const when = t.depart && (t.ret || t.depart)
+      ? "Pickup at " + L.label + " on " + t.depart + ", return on " + (t.ret || t.depart) + ". Times default to 10:30 a.m. — change the time on the search site to match your flight."
+      : "Add your flight dates above so these buttons open the right pickup and return days. Pickup is set to your arrival airport (" + L.apt + ").";
+    return `<div class="card" id="rent-car">
+      <p class="kicker">After you search flights</p>
+      <h3>Rent a car at ${esc(L.apt)}</h3>
+      <p>Compare live car-rental prices for pickup at ${esc(L.label)} and return at the same airport on your departure day. This app does not invent rates. You can change times, car type, or a one-way return on the site you open.</p>
+      <p class="muted">${esc(when)}</p>
+      <div class="btns">
+        <a class="btn btn-gold" target="_blank" rel="noopener" href="${esc(L.kayak)}">Kayak Cars</a>
+        <a class="btn btn-green" target="_blank" rel="noopener" href="${esc(L.expedia)}">Expedia Cars</a>
+        <a class="btn btn-outline" target="_blank" rel="noopener" href="${esc(L.google)}">Google</a>
+        <a class="btn btn-outline" target="_blank" rel="noopener" href="${esc(L.priceline)}">Priceline</a>
+        <a class="btn btn-outline" target="_blank" rel="noopener" href="${esc(L.discover)}">Discover Cars</a>
+      </div>
+      <div class="btns">
+        <a class="btn btn-outline btn-sm" href="#/cars">See rental companies at MBJ and KIN</a>
+        ${saveBtn({ id: "car-" + L.apt, type: "car", name: "Car rental at " + L.apt, place: L.label, area: "" })}
+      </div>
+    </div>`;
+  }
+
+  function carCard(c, aptFilter) {
+    const showAirports = (c.airports || []).filter((a) => !aptFilter || a === aptFilter);
+    if (aptFilter && !showAirports.length) return "";
+    const locUrl = aptFilter && c.loc && c.loc[aptFilter] ? c.loc[aptFilter] : c.official;
+    return `<article class="card">
+      <div class="between">
+        <div>
+          <h3>${esc(c.name)}</h3>
+          <p class="muted">${c.kind === "local" ? "Jamaican company" : "International brand"} · ${esc((c.airports || []).join(" and "))}</p>
+        </div>
+        <div class="row">${(c.airports || []).map((a) => `<span class="tag">${esc(a)}</span>`).join("")}</div>
+      </div>
+      <p>${esc(c.pickup)}</p>
+      <p class="source">Source: ${esc(c.source)}</p>
+      <div class="btns">
+        ${c.official ? `<a class="btn btn-gold btn-sm" target="_blank" rel="noopener" href="${esc(c.official)}">Official site</a>` : ""}
+        ${locUrl && locUrl !== c.official ? `<a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(locUrl)}">Airport location</a>` : ""}
+        ${saveBtn({ id: "carco-" + c.id, type: "car", name: c.name, place: (c.airports || []).join(" / ") + " car rental", area: "" })}
+      </div>
+    </article>`;
+  }
+
   function resortCard(r, compact) {
     const status = r.status
       ? `<span class="tag warn">${esc(r.status.label)}</span>`
@@ -351,7 +426,7 @@
       <section class="hero">
         <p class="kicker">Frisco, Texas → Jamaica</p>
         <h1>Jamaica Vacation</h1>
-        <p>Find the cheapest live airfares, well-known all-inclusive resorts, villas, and Airbnbs in gated communities — in Montego Bay, St. James, Trelawny, Ocho Rios, Negril, Portmore, and Kingston &amp; St. Andrew.</p>
+        <p>Find the cheapest live airfares, rental cars at MBJ and KIN, well-known all-inclusive resorts, villas, and Airbnbs in gated communities — in Montego Bay, St. James, Trelawny, Ocho Rios, Negril, Portmore, and Kingston &amp; St. Andrew.</p>
         <p>This app is for planning only. It never books a flight or room and never takes a card or passport number. You type in the prices you find, and you decide what to book.</p>
       </section>
       <div class="banner">
@@ -374,6 +449,7 @@
       <h2 style="margin-top:22px">Quick tools</h2>
       <div class="navgrid">
         <a href="#/flights">✈ Flights<span>Live searches to MBJ or KIN. No made-up fares.</span></a>
+        <a href="#/cars">🚗 Car rental<span>Companies at MBJ and KIN, plus live price comparisons.</span></a>
         <a href="#/stays">🏨 All-inclusives<span>Well-known resorts, official sites, compare prices.</span></a>
         <a href="#/villas">🏡 Villas<span>Airbnb, Vrbo and Booking searches by area.</span></a>
         <a href="#/gated">🔒 Gated Airbnbs<span>Verified communities plus a safety checklist.</span></a>
@@ -418,6 +494,7 @@
         </div>
         <p class="note">Southwest flies from Dallas Love Field (DAL), not from DFW. If you chose DFW, the Southwest button starts a DAL search so you can still compare Love Field.</p>
       </div>
+      ${carCompareBtns(t)}
       <h2>Who actually flies this route</h2>
       <p class="lead">Checked ${esc(JV.RESEARCH_DATE)}. Airlines change schedules — always confirm on the airline’s site.</p>
       ${JV.CARRIERS.map((c) => `
@@ -736,7 +813,7 @@
     return `
       <p class="kicker">Your numbers only</p>
       <h1>Budget planner</h1>
-      <p class="lead">Type the prices you see on airline and hotel sites. This app will not fill in a fare or a hotel rate for you. Totals update as you type. Amounts stay on this device.</p>
+      <p class="lead">Type the prices you see on airline, hotel and car-rental sites. This app will not fill in a fare, a hotel rate, or a car rate for you. Totals update as you type. Amounts stay on this device.</p>
       <div class="card">
         <table class="table">
           <thead><tr><th>Item</th><th>Amount (USD)</th></tr></thead>
@@ -788,6 +865,44 @@
     `;
   }
 
+  function viewCars() {
+    const t = trip();
+    const at = (apt) => JV.CARS.filter((c) => (c.airports || []).includes(apt));
+    return `
+      <p class="kicker">Ground transportation</p>
+      <h1>Car rental</h1>
+      <p class="lead">${esc(JV.CARS_NOTE)}</p>
+      ${carCompareBtns(t)}
+      <h2>Sangster International (MBJ) — Montego Bay</h2>
+      <p class="lead">Sangster’s official car-rental page says companies are in the Ground Transportation and Arrivals Hall after you exit Customs. Some then walk or shuttle you to the car lot.</p>
+      <p><a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(JV.LINKS.mbjCars)}">Official MBJ car-rental list</a></p>
+      ${at("MBJ").map((c) => carCard(c, "MBJ")).join("")}
+      <h2>Norman Manley International (KIN) — Kingston</h2>
+      <p class="lead">Companies below have an official company page, booking location, or other official source placing them at KIN. Several official pages say the counter is in the terminal or ground-transportation hall.</p>
+      ${at("KIN").map((c) => carCard(c, "KIN")).join("")}
+      <p class="note">Island Car Rentals and Apex Car Rentals are the Jamaican companies in the lists above. International brands are marked on each card. Fiesta Car Rentals was not included because its official website did not load when checked on November 22, 2026.</p>
+      <h2>Driving in Jamaica</h2>
+      ${JV.DRIVE_TIPS.map((tip) => `<article class="card"><h3>${esc(tip.title)}</h3><p>${esc(tip.body)}</p></article>`).join("")}
+      <div class="card">
+        <h3>Official driving and rental pages</h3>
+        <div class="btns">
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(JV.LINKS.visitCars)}">Visit Jamaica — renting a car</a>
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(JV.LINKS.stateDept)}">U.S. State Department — Jamaica</a>
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(JV.LINKS.jisRoad)}">JIS — rules of the road</a>
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(JV.LINKS.avisFaqs)}">Avis Jamaica FAQs</a>
+          <a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(JV.LINKS.hertzFaqs)}">Hertz Jamaica FAQs</a>
+        </div>
+      </div>
+      <h2>If you’d rather not drive</h2>
+      ${JV.TRANSPORT_ALTS.map((a) => `<article class="card">
+        <h3>${esc(a.title)}</h3>
+        <p>${esc(a.body)}</p>
+        ${a.url ? `<div class="btns"><a class="btn btn-outline btn-sm" target="_blank" rel="noopener" href="${esc(a.url)}">${esc(a.label || "Official page")}</a></div>` : ""}
+      </article>`).join("")}
+      ${botCard(true)}
+    `;
+  }
+
   function viewMore() {
     return `
       <p class="kicker">App</p>
@@ -798,6 +913,7 @@
         <a href="#/budget">Budget planner</a>
         <a href="#/pack">Packing list</a>
         <a href="#/entry">Entry essentials</a>
+        <a href="#/cars">Car rental</a>
         <a href="#/villas">Villas</a>
         <a href="#/gated">Gated Airbnbs</a>
       </div>
@@ -805,14 +921,14 @@
       <div class="card">
         <h3>Install this app</h3>
         <p>On a phone or tablet in Chrome: tap <strong>⋮</strong>, then <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p>
-        <p>On a computer, your App maker can add a desktop icon. The app works offline for the pages already opened, but live flight and hotel searches need a connection.</p>
+        <p>On a computer, your App maker can add a desktop icon. The app works offline for the pages already opened, but live flight, hotel and car-rental searches need a connection.</p>
       </div>
       <div class="card">
         <h3>What this app will not do</h3>
         <ul>
           <li>It will not book a flight, hotel, villa, or car.</li>
           <li>It will not take a card, password, passport number, or other private ID.</li>
-          <li>It will not invent a fare, a hotel rate, or a star rating.</li>
+          <li>It will not invent a fare, a hotel rate, a car-rental rate, or a star rating.</li>
         </ul>
       </div>
       <p class="footer">Jamaica Vacation · researched ${esc(JV.RESEARCH_DATE)} · facts only · no bookings or payments.</p>
@@ -834,6 +950,7 @@
     let html = "";
     if (page === "home" || page === "") html = viewHome();
     else if (page === "flights") html = viewFlights();
+    else if (page === "cars") html = viewCars();
     else if (page === "areas") html = viewAreas();
     else if (page === "area") html = viewArea(id);
     else if (page === "stays") html = viewStays();

@@ -1,4 +1,4 @@
-const C = 'jamaica-vacation-v1';
+const C = 'jamaica-vacation-v2';
 const F = [
   './',
   'index.html',

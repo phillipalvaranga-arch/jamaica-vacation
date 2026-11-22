@@ -13,7 +13,15 @@ JV.LINKS = {
   reopenings: "https://www.visitjamaica.com/travel-alerts/hotel-reopenings/",
   alerts: "https://www.visitjamaica.com/travel-alerts/",
   pica: "https://www.pica.gov.jm/",
-  stateDept: "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Jamaica.html"
+  stateDept: "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Jamaica.html",
+  mbjCars: "https://www.mbjairport.com/car-rentals",
+  mbjTaxis: "https://www.mbjairport.com/taxi-cabs",
+  visitCars: "https://www.visitjamaica.com/plan-your-adventure/getting-around/vehicle-rentals-transportation-services/",
+  knutsford: "https://www.knutsfordexpress.com/",
+  knutsfordConnect: "https://www.knutsfordexpress.com/charters/knutsford-connect/",
+  avisFaqs: "https://www.avis.com.jm/faqs",
+  hertzFaqs: "https://hertz-ja.com/faqs/",
+  jisRoad: "https://jis.gov.jm/information/get-the-facts/the-road-traffic-regulations-rules-of-the-road/"
 };
 
 JV.DRIVE_NOTE = "Typical private-transfer times drawn from Jamaica transfer operators and travel guides (including reports updated in 2026). Traffic, cruise-ship days in Falmouth, rain, and time of day can add to the journey.";
@@ -656,6 +664,7 @@ JV.SAFETY = [
 
 JV.PACK = [
   { id: "passport", label: "Valid passport (needed for U.S. citizens to enter Jamaica and to return to the U.S.)" },
+  { id: "license", label: "Physical U.S. driver’s license if you plan to rent a car (Visit Jamaica says photocopies or digital copies are not accepted)" },
   { id: "c5", label: "C5 confirmation (screenshot or printout) — free form at enterjamaica.gov.jm, one per traveller, up to 30 days before you fly" },
   { id: "tickets", label: "Return or onward ticket details (Jamaica asks visitors to show one)" },
   { id: "address", label: "Address of your hotel or Airbnb in Jamaica (needed for the C5 form)" },
@@ -698,10 +707,214 @@ JV.ENTRY = [
   }
 ];
 
+
+JV.CARS_NOTE = "Companies below were verified on November 22, 2026, from official airport pages, official company location pages, or the Airports Authority of Jamaica. Counters, hours, and shuttle arrangements can change — confirm with the company when you book. This app does not invent rental prices.";
+
+JV.CARS = [
+  {
+    id: "avis",
+    name: "Avis",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://www.avis.com.jm/",
+    loc: {
+      MBJ: "https://www.avis.com/en/locations/lat/jm/montego-bay/mbj",
+      KIN: "https://www.avis.com/en/locations/lat/jm/kingston/kin"
+    },
+    pickup: "Sangster’s official car-rental page places companies in the Ground Transportation and Arrivals Hall after Customs. Avis’s KIN page says the rental counter is in the terminal, with a short walk to the car lot. Avis Jamaica’s FAQ lists both Norman Manley and Sangster as airport locations.",
+    source: "mbjairport.com/car-rentals; avis.com location pages; avis.com.jm/faqs."
+  },
+  {
+    id: "budget",
+    name: "Budget",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://budgetjamaica.com/",
+    loc: { MBJ: "https://budgetjamaica.com/", KIN: "https://budgetjamaica.com/" },
+    pickup: "Budget Jamaica (Tropic Island Trading, authorised Budget licensee) lists both Sangster and Norman Manley on its official site. A Budget location page for KIN says the counter is in the terminal across from baggage claim, and a shuttle bus takes you to the car in the parking lot.",
+    source: "budgetjamaica.com; Budget KIN location page; mbjairport.com/car-rentals."
+  },
+  {
+    id: "hertz",
+    name: "Hertz",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://hertz-ja.com/",
+    loc: {
+      MBJ: "https://www.hertz.com/us/en/location/jamaica/montegobay/mbjt50",
+      KIN: "https://hertz-ja.com/"
+    },
+    pickup: "Hertz Jamaica’s official FAQ lists airport offices at Donald Sangster International (Montego Bay) and Norman Manley International (Kingston), as well as city offices. Sangster’s official page lists Hertz among companies in the Ground Transportation and Arrivals Hall after Customs.",
+    source: "hertz-ja.com/faqs; hertz.com MBJ location page; mbjairport.com/car-rentals."
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://www.enterprise.com/en/car-rental-locations/jm/montego-bay-sangster-intl-airport-z902.html",
+    loc: {
+      MBJ: "https://www.enterprise.com/en/car-rental-locations/jm/montego-bay-sangster-intl-airport-z902.html",
+      KIN: "https://www.enterprise.com/en/car-rental-locations/jm/kingston-norman-manley-intl-airport-z912.html"
+    },
+    pickup: "Enterprise, Alamo and National are listed together on official airport materials and share the Jamaica phone 876-906-0084. Enterprise’s MBJ page says that after exiting Customs, rental counters are on the right (pickup shuttle not offered). At KIN, Enterprise and Alamo say: after exiting Customs Hall go straight to the car rental aisle; the booth is the second office on the right; no shuttle is required.",
+    source: "Official Enterprise MBJ and KIN location pages; mbjairport.com/car-rentals."
+  },
+  {
+    id: "alamo",
+    name: "Alamo",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://www.alamo.com/en/car-rental-locations/jm/kingston-norman-manley-intl-airport-z911.html",
+    loc: {
+      MBJ: "https://www.alamo.com/en/car-rental-locations/jm/montego-bay-sangster-intl-airport-z903.html",
+      KIN: "https://www.alamo.com/en/car-rental-locations/jm/kingston-norman-manley-intl-airport-z911.html"
+    },
+    pickup: "Listed on Sangster’s official car-rental page. Alamo’s KIN page: after exiting Customs Hall, continue to the car rental aisle; the booth is the second office on the right; no shuttle is required. Same Jamaica operator family as Enterprise and National (phone 876-906-0084 on official airport lists).",
+    source: "alamo.com KIN location page; mbjairport.com/car-rentals."
+  },
+  {
+    id: "national",
+    name: "National",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://www.nationalcar.com/en/car-rental-locations/jm/montego-bay-sangster-intl-airport-z901.html",
+    loc: {
+      MBJ: "https://www.nationalcar.com/en/car-rental-locations/jm/montego-bay-sangster-intl-airport-z901.html",
+      KIN: "https://www.enterprise.com/en/car-rental-locations/jm/kingston-norman-manley-intl-airport-z912.html"
+    },
+    pickup: "Sangster’s official page lists National in the arrivals hall. Enterprise’s MBJ page notes the National counter is the fifth booth on the right after Customs. At KIN, Enterprise/Alamo/National are listed as one desk in official airport materials; the Enterprise/Alamo KIN pages say no shuttle is required.",
+    source: "nationalcar.com MBJ location page; Enterprise MBJ/KIN location pages; mbjairport.com/car-rentals."
+  },
+  {
+    id: "thrifty",
+    name: "Thrifty",
+    kind: "international",
+    airports: ["MBJ"],
+    official: "https://www.thrifty.com/",
+    loc: { MBJ: "https://www.thrifty.com/" },
+    pickup: "Listed on Sangster’s official car-rental page (same hall after Customs). The airport page shows the same Montego Bay phone as Dollar and Europcar. A KIN airport location was not verified on an official Thrifty or airport page, so Kingston is not listed here.",
+    source: "mbjairport.com/car-rentals; thrifty.com."
+  },
+  {
+    id: "dollar",
+    name: "Dollar",
+    kind: "international",
+    airports: ["MBJ"],
+    official: "https://www.dollar.com/",
+    loc: { MBJ: "https://www.dollar.com/" },
+    pickup: "Listed on Sangster’s official car-rental page (Ground Transportation and Arrivals Hall after Customs). Same airport-listed phone as Thrifty and Europcar. A KIN airport location was not verified, so Kingston is not listed here.",
+    source: "mbjairport.com/car-rentals; dollar.com."
+  },
+  {
+    id: "europcar",
+    name: "Europcar",
+    kind: "international",
+    airports: ["MBJ"],
+    official: "https://www.europcar.com/",
+    loc: { MBJ: "https://www.europcar.com/" },
+    pickup: "Listed on Sangster’s official car-rental page. Same airport-listed phone as Dollar and Thrifty. A KIN airport location was not verified, so Kingston is not listed here.",
+    source: "mbjairport.com/car-rentals; europcar.com."
+  },
+  {
+    id: "sixt",
+    name: "Sixt",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://www.sixt.com/",
+    loc: {
+      MBJ: "https://www.sixt.com/car-rental/jamaica/montego-bay/montego-bay-sangster-int-ap/",
+      KIN: "https://www.sixt.com/car-rental/jamaica/kingston/kingston-airport/"
+    },
+    pickup: "Sixt’s official MBJ page says the branch is at the airport, to the right after the arrival hall, next to Delayed Baggage Reclaim; parking is in the airport car-rental lot. The same page also mentions a courtesy shuttle — confirm on arrival. Sixt’s official KIN page says the branch is in the ground transportation hall inside the terminal, with cars in the airport parking lot across from the arrival terminal.",
+    source: "sixt.com official MBJ and Kingston Airport location pages; mbjairport.com/car-rentals."
+  },
+  {
+    id: "payless",
+    name: "Payless",
+    kind: "international",
+    airports: ["MBJ","KIN"],
+    official: "https://www.paylesscar.com/",
+    loc: {
+      MBJ: "https://www.paylesscar.com/en/locations/jm/montego-bay/mbj",
+      KIN: "https://www.paylesscar.com/en/locations/jm/kingston/kin"
+    },
+    pickup: "Listed on Sangster’s official car-rental page. Payless has official location pages for both Montego Bay (MBJ) and Kingston (address given as Palisadoes, the Norman Manley airport area). The Kingston page mentions shuttle information — confirm the current pickup steps when you book.",
+    source: "paylesscar.com official MBJ and KIN location pages; mbjairport.com/car-rentals."
+  },
+  {
+    id: "island",
+    name: "Island Car Rentals",
+    kind: "local",
+    airports: ["MBJ","KIN"],
+    official: "https://www.islandcarrentals.com/",
+    loc: { MBJ: "https://www.islandcarrentals.com/home.aspx/contactus", KIN: "https://www.islandcarrentals.com/home.aspx/contactus" },
+    pickup: "Jamaica’s long-established local company. Its official contact page lists in-terminal offices at Donald Sangster International (Montego Bay) and Norman Manley International (Kingston). Also listed on Sangster’s official car-rental page.",
+    source: "islandcarrentals.com contact and about pages; mbjairport.com/car-rentals."
+  },
+  {
+    id: "apex",
+    name: "Apex Car Rentals",
+    kind: "local",
+    airports: ["MBJ","KIN"],
+    official: "https://apex-cars.com/",
+    loc: { MBJ: "https://www.apex-cars.com/contactus.html", KIN: "https://reservations.apex-cars.com/" },
+    pickup: "The Airports Authority of Jamaica lists Apex Car Rental among Sangster transportation contacts (phone 876-382-8292, which matches Apex’s official contact page). Apex’s official booking page includes a “Norman Manley International Airport Rental Location.” Published branch addresses are Shop 14, St. James Place, Gloucester Avenue, Montego Bay, and St. Thomas Road, Harbour View, Kingston — so pickup may be in-terminal, a meet-and-greet, or a short transfer. Confirm the exact pickup with Apex when you book.",
+    source: "apex-cars.com and contact/reservations pages; airportsauthorityjamaica.aero Sangster page."
+  }
+];
+
+JV.DRIVE_TIPS = [
+  {
+    title: "Drive on the left",
+    body: "Jamaica drives on the left, and most rental cars are right-hand drive. The Jamaica Information Service cites the Road Traffic Regulations 2022 on keeping left. Traffic in a roundabout moves clockwise; drivers entering must yield to those already in it, according to the U.S. State Department’s Jamaica page."
+  },
+  {
+    title: "U.S. driver’s license",
+    body: "Visit Jamaica says North Americans may use their country’s license for up to three months per visit. You must carry the physical license — photocopies or digital copies are not accepted. An International Driving Permit is generally not required if your license is in English. Visit Jamaica also says the license should have been valid for at least one year. Keep the physical license with you whenever you drive."
+  },
+  {
+    title: "Minimum age and young drivers",
+    body: "Rules are set by each company, and they do not all match. Visit Jamaica’s rental tips say clients must be at least 25, while its FAQ says the average minimum age is 23. Avis Jamaica’s official FAQ says you must be over 23. Sixt’s official MBJ and Kingston airport pages say you must be at least 23, and that some car categories have a higher minimum and an underage-driver fee may apply. Hertz Jamaica’s FAQ says authorized drivers must be at least 23, with a license at least two years old. Always confirm the age, any young-driver fee, and extra-driver rules with the company you book."
+  },
+  {
+    title: "Insurance and damage waivers",
+    body: "Jamaica law requires third-party insurance for vehicles used on the road. Avis Jamaica’s FAQ says third-party liability is already included in its quoted rates. Optional collision or loss-damage waivers (CDW, LDW, PDW — names vary) are usually offered at the counter to reduce your liability if the rental car is damaged or stolen. They are waivers, not a substitute for reading the contract, and often exclude items such as tyres, rims, tools or keys (Avis Jamaica states those exclusions). Hertz Jamaica’s FAQ describes CDW as a daily fee that limits or, in some cases, removes liability. This app does not invent waiver prices — ask the company for the current cost and what is left uncovered."
+  },
+  {
+    title: "Credit cards and holds",
+    body: "Visit Jamaica says a credit card may be required to rent some vehicles. Avis Jamaica accepts major credit cards. Hertz Jamaica’s FAQ says a valid credit card is required (a debit card only with prior management approval; cash is not accepted) and that deposit options vary — in some cases you may not have to leave a large deposit. If you decline the company’s damage waiver and rely on credit-card coverage, Avis Jamaica warns that many cards do not cover rentals in Jamaica, and that you can be responsible up to the full value of the car if the waiver is declined. Hertz Jamaica says some cards do offer coverage in Jamaica, but you should have your issuer send a benefits letter. Call your card issuer before you travel, get the coverage in writing if you plan to use it, and expect the company to place a hold on the card. Do not type card numbers into this app."
+  },
+  {
+    title: "Road safety",
+    body: "Speed limits are posted in km/h. Visit Jamaica gives 50 km/h (about 30 mph) in built-up areas and 80 km/h (about 50 mph) on highways. Seat belts are legally required; children under 3 must travel in infant carriers (Visit Jamaica). Using a phone while driving without hands-free equipment is illegal. The U.S. State Department warns that night driving is extremely hazardous because of poor lighting and uneven pavement; many roads have potholes, weak signage, and pedestrians or animals in the road; heavy rain can make roads dangerous; and there have been reports of carjackings, including of rental cars. It recommends particular caution at night and on poorly lit rural or mountain roads. Emergency number in Jamaica is 119. If you have an accident, contact the police and then the rental company — do not arrange repairs on your own (Avis Jamaica’s FAQ states that is a contract breach)."
+  }
+];
+
+JV.TRANSPORT_ALTS = [
+  {
+    title: "Licensed airport taxis (JUTA and JCAL)",
+    body: "Sangster’s official taxi page says two taxi companies operate at MBJ — JUTA and JCAL — and they share an Authorised Airport Taxi desk just outside the Customs exit. JUTA’s listed phone on that page is (876) 952-0813. Use the official airport desk rather than unsolicited offers in the hall. This is often the simplest way from the airport to a hotel if you do not want to drive.",
+    url: "https://www.mbjairport.com/taxi-cabs",
+    label: "MBJ official taxi page"
+  },
+  {
+    title: "Knutsford Express and Knutsford Connect",
+    body: "Knutsford Express is Jamaica’s well-known intercity coach service (official site knutsfordexpress.com). Knutsford Connect is their airport-transfer service, including a connection for Norman Manley (KIN). Check the official site for current routes, airport desks, and fares — this app does not invent ticket prices.",
+    url: "https://www.knutsfordexpress.com/charters/knutsford-connect/",
+    label: "Knutsford Connect"
+  },
+  {
+    title: "Hotel and resort transfers",
+    body: "Many all-inclusive resorts include or sell round-trip airport transfers (Sandals, for example, lists transfers as included). If you are staying at a resort, compare a transfer or a licensed taxi against the cost and stress of driving, especially after a long flight or for a night arrival."
+  }
+];
+
 JV.BUDGET_ROWS = [
   { id: "flights", label: "Flights" },
   { id: "stay", label: "Hotel, villa, or Airbnb" },
-  { id: "transfer", label: "Airport transfers / car" },
+  { id: "car", label: "Car rental" },
+  { id: "transfer", label: "Airport transfers" },
   { id: "food", label: "Food and drinks (beyond an all-inclusive)" },
   { id: "activities", label: "Activities and excursions" },
   { id: "tips", label: "Tips" },
